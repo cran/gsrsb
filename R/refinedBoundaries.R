@@ -1,13 +1,14 @@
 ##########
 # A gatekeeping test on a primary and a secondary endpoint in a group sequential design with multiple interim looks
 # R program for Refined Boundaries
-# Version 1.0
+# Version 1.1
 # Programmer: Jiangtao Gou
-# 2017/Mar/14-Apr/12
+# Version 1.0: 2017/Mar/14-Apr/12
+# Version 1.1: 2019/Jun/24
 # Reference: Tamhane AC, Gou J, Jennison C, Mehta CR, Curto T.
 #   A Gatekeeping Test on a Primary and a Secondary Endpoint in a Group
 #   Sequential Design with Multiple Interim Looks.
-#   Biometrics (2017+).
+#   Biometrics (2018).
 ##########
 
 require(mvtnorm)
@@ -43,10 +44,10 @@ require(xtable)
 #' @author Jiangtao Gou
 #'
 #' @details
-#' This function generates upper and lower bounds for further computation. For more details, refer to Tamhane et al. (2017+), section 4.2.
+#' This function generates upper and lower bounds for further computation. For more details, refer to Tamhane et al. (2018, Biometrics), section 4.2.
 #'
 #' @references
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 #'
 #' @examples
 #' cvec <- rep(1.992,3)
@@ -103,14 +104,14 @@ cdBoundary <- function (cvec, dvec, gammaVec, dlt, upper=TRUE) {
 #' @return correlation matrix, K by K for primary endpoint, (K+1) by (K+1) for secondary endpoint, where K is the number of interims.
 #'
 #' @details
-#' This function generates correlation matrix between different mean statistics. For more details, refer to Tamhane et al. (2017+), section 2.
+#' This function generates correlation matrix between different mean statistics. For more details, refer to Tamhane et al. (2018, Biometrics), section 2.
 #' @export
 #' @import mvtnorm
 #' @import stats
 #' @import ldbounds
 #'
 #' @references
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 #'
 #' @examples
 #' corrMat <- genCorrMat(gammaVec=c(sqrt(1/3),sqrt(2/3),1), type=2, rhoPS = 0.3)
@@ -183,7 +184,7 @@ genCorrMat <- function (gammaVec, type, rhoPS = 0) {
 #' @references
 #' Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 #'
 ldPrimaryBoundary <- function (tVec,alpha,type=1,initIntvl=c(0.8,8)) {
   K <- length(tVec);
@@ -195,7 +196,7 @@ ldPrimaryBoundary <- function (tVec,alpha,type=1,initIntvl=c(0.8,8)) {
     upperB <- c(cVec,ckk);
     meanV <- rep(0,kk);
     corrM <- genCorrMat(gammaVec,1);
-    result <- pmvnorm(lowerB, upperB, meanV, corrM);
+    result <- pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
     return(result - 1 + alpha);
   }
   if (type == 1) {
@@ -269,7 +270,7 @@ ldPrimaryBoundary <- function (tVec,alpha,type=1,initIntvl=c(0.8,8)) {
 #' @references
 #' Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 #'
 ldSecControl <- function (ap,alpha,cvec,tVec,ExtrmLoc,type=2) {
   K <- length(tVec);
@@ -291,7 +292,7 @@ ldSecControl <- function (ap,alpha,cvec,tVec,ExtrmLoc,type=2) {
     upperB <- cdBoundary(cvec[1:i], dvec[1:i], gammaVec[1:i], dlt, upper=TRUE);
     meanV <- rep(0,i);
     corrM <- genCorrMat(gammaVec[1:i],1);
-    ErrRate = ErrRate + pmvnorm(lowerB, upperB, meanV, corrM);
+    ErrRate = ErrRate + pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
   }
   return(ErrRate - alpha);
 }
@@ -345,7 +346,7 @@ primaryBoundary <- function (gammaVec,alpha,type=1,initIntvl=c(1,4)) {
       upperB <- c/gammaVec;
       meanV <- rep(0,K);
       corrM <- genCorrMat(gammaVec,1);
-      result <- pmvnorm(lowerB, upperB, meanV, corrM);
+      result <- pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
       return(result - 1 + alpha);
     }
     result.OF <- uniroot(target, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, gammaVec = gammaVec, alpha = alpha);
@@ -356,7 +357,7 @@ primaryBoundary <- function (gammaVec,alpha,type=1,initIntvl=c(1,4)) {
       upperB <- c;
       meanV <- rep(0,K);
       corrM <- genCorrMat(gammaVec,1);
-      result <- pmvnorm(lowerB, upperB, meanV, corrM);
+      result <- pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
       return(result - 1 + alpha);
     }
     result.OF <- uniroot(target, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, gammaVec = gammaVec, alpha = alpha);
@@ -410,7 +411,7 @@ primaryBoundary <- function (gammaVec,alpha,type=1,initIntvl=c(1,4)) {
 #' @seealso \code{ldSecControl}
 #'
 #' @references
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 #'
 secControl <- function (d,alpha,cvec,gammaVec,ExtrmLoc,type=2) {
   K <- length(gammaVec);
@@ -429,7 +430,7 @@ secControl <- function (d,alpha,cvec,gammaVec,ExtrmLoc,type=2) {
     upperB <- cdBoundary(cvec[1:i], dvec[1:i], gammaVec[1:i], dlt, upper=TRUE);
     meanV <- rep(0,i);
     corrM <- genCorrMat(gammaVec[1:i],1);
-    ErrRate = ErrRate + pmvnorm(lowerB, upperB, meanV, corrM);
+    ErrRate = ErrRate + pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
   }
   return(ErrRate - alpha);
 }
@@ -447,7 +448,6 @@ secControl <- function (d,alpha,cvec,gammaVec,ExtrmLoc,type=2) {
 #     for function primaryBoundary or function ldPrimaryBoundary
 #  OBF: TRUE for OBF, FALSE for POC
 #  LanDeMets: TRUE for Lan-Demets type boundaries, FALSE for original boundaries
-#  nRep: number of replica
 #  digits: number of digits for output,
 #  printOut: TRUE for printing the boundaries.
 # Output:
@@ -469,7 +469,6 @@ secControl <- function (d,alpha,cvec,gammaVec,ExtrmLoc,type=2) {
 #' @param initIntvl parameter for function uniroot (two numbers) for function primaryBoundary or function ldPrimaryBoundary
 #' @param OBF type of procedures. \code{TRUE} for OBF, \code{FALSE} for POC.
 #' @param LanDeMets type of procedures. \code{TRUE} for Lan-Demets type boundaries, \code{FALSE} for original boundaries.
-#' @param nRep number of replica
 #' @param digits number of digits for output,
 #' @param printOut \code{TRUE} for printing the boundaries.
 #' @return OBF and POC boundaries (primary endpoints) (vector).
@@ -482,13 +481,13 @@ secControl <- function (d,alpha,cvec,gammaVec,ExtrmLoc,type=2) {
 #' #alpha = 0.025
 #' #tVec = (1:K)/K
 #' #boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
-#' #   OBF=TRUE,LanDeMets=FALSE,nRep=1,digits=3,printOut=TRUE)
+#' #   OBF=TRUE,LanDeMets=FALSE,digits=3,printOut=TRUE)
 #' #boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
-#' #   OBF=FALSE,LanDeMets=FALSE,nRep=1,digits=3,printOut=TRUE)
+#' #   OBF=FALSE,LanDeMets=FALSE,digits=3,printOut=TRUE)
 #' #boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,8),
-#' #   OBF=TRUE,LanDeMets=TRUE,nRep=1,digits=3,printOut=TRUE)
+#' #   OBF=TRUE,LanDeMets=TRUE,digits=3,printOut=TRUE)
 #' #boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
-#' #   OBF=FALSE,LanDeMets=TRUE,nRep=1,digits=3,printOut=TRUE)
+#' #   OBF=FALSE,LanDeMets=TRUE,digits=3,printOut=TRUE)
 #'
 #' @references
 #'  Jennison, C. and Turnbull, B. W. (2000). \emph{Group Sequential Methods with Applications to Clinical Trials}. Chapman and Hall/CRC, New York.
@@ -499,14 +498,14 @@ secControl <- function (d,alpha,cvec,gammaVec,ExtrmLoc,type=2) {
 #'
 #'  Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 #'
 #' @export
 #' @import mvtnorm
 #' @import stats
 #' @import ldbounds
 #'
-primaryBoundaryVec  <- function (alpha,tVec,OBF=TRUE,LanDeMets=FALSE,nRep=100,digits=2,printOut=TRUE,initIntvl=c(1,8)) {
+primaryBoundaryVec  <- function (alpha,tVec,OBF=TRUE,LanDeMets=FALSE,digits=2,printOut=TRUE,initIntvl=c(1,8)) {
   K <- length(tVec);
   gammaVec <- sqrt(tVec);
   if (OBF == TRUE) {
@@ -515,8 +514,8 @@ primaryBoundaryVec  <- function (alpha,tVec,OBF=TRUE,LanDeMets=FALSE,nRep=100,di
     typeOP = 2;
   }
   if (LanDeMets == FALSE) {
-    bndyRep <- rep(0,nRep);
-    for (i in 1:nRep) {
+    bndyRep <- rep(0,1);
+    for (i in 1:1) {
       bndyRep[i] <- primaryBoundary(gammaVec,alpha,typeOP,initIntvl);
     }
     cK <- median(bndyRep);
@@ -531,8 +530,8 @@ primaryBoundaryVec  <- function (alpha,tVec,OBF=TRUE,LanDeMets=FALSE,nRep=100,di
     }
     return(bndyVec);
   } else {  # Lan-DeMets
-    bndyRep <- matrix(rep(0,nRep*K),nrow=nRep);
-    for (i in 1:nRep) {
+    bndyRep <- matrix(rep(0,1*K),nrow=1);
+    for (i in 1:1) {
       bndyRep[i,] <- ldPrimaryBoundary(tVec,alpha,typeOP,initIntvl);
     }
     bndyVec <- rep(0,K);
@@ -560,7 +559,6 @@ primaryBoundaryVec  <- function (alpha,tVec,OBF=TRUE,LanDeMets=FALSE,nRep=100,di
 #  cVec: primary boundaries are given
 #  type: OBF 1, POC 2
 #  initIntvl: parameters for uniroot
-#  initNrep: number of replica
 # Output:
 #  Inital location of maximum (a number between 1 and K)
 # Dependency:
@@ -577,7 +575,6 @@ primaryBoundaryVec  <- function (alpha,tVec,OBF=TRUE,LanDeMets=FALSE,nRep=100,di
 #' @param cvec primary group sequential boundary.
 #' @param type type of the test procedure for the secondary endpoint. O'Brien- Fleming (OBF) type error spending funciton is 1, Pocock (POC) type error spending funciton is 2.
 #' @param initIntvl computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.
-#' @param initNrep computing paramter, number of replica.
 #' @return location of maximum, a number between 1 and the number of interims
 #'
 #' @details
@@ -597,21 +594,20 @@ primaryBoundaryVec  <- function (alpha,tVec,OBF=TRUE,LanDeMets=FALSE,nRep=100,di
 #' #alpha = 0.025
 #' #c <- 2.072274
 #' #cvec <- c/gammaVec
-#' #loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,3),
-#' #      initNrep=1)
+#' #loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,3))
 #'
 #' @references
 #'  O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
 #'
 #'  Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
 #'
-initLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(1,4),initNrep=10) {
+initLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(1,4)) {
   K <- length(tVec);
   gammaVec <- sqrt(tVec);
-  locVec <- rep(0,initNrep);
-  for (j in 1:initNrep) {
+  locVec <- rep(0,1);
+  for (j in 1:1) {
     resultVec <- rep(0,K); # Need to be predefined, otherwise the program does not work
     for (i in 1:K) {
       result <- uniroot(secControl,lower=initIntvl[1],upper=initIntvl[2],tol=2.5e-16,alpha=alpha,cvec=cvec,gammaVec=gammaVec,ExtrmLoc=i,type=type);
@@ -639,7 +635,6 @@ initLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(1,4),initNrep=10) {
 #  locPeak: location of maximum, returned by function initLocPeak
 #  type: OBF 1, POC 2
 #  initIntvl: parameters for uniroot
-#  nRep: number of replica
 # Output:
 #  boundary vector
 # Dependency:
@@ -658,7 +653,6 @@ initLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(1,4),initNrep=10) {
 #' @param locPeak location of maximum, a number between 1 and the number of interims.
 #' @param type type of the test procedure for the secondary endpoint. O'Brien- Fleming (OBF) type error spending funciton is 1, Pocock (POC) type error spending funciton is 2.
 #' @param initIntvl computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.
-#' @param nRep computing paramter, number of replica.
 #' @return standard O'Brien-Fleming and Pocock refined secondary boundaries.
 #'
 #' @details
@@ -678,23 +672,22 @@ initLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(1,4),initNrep=10) {
 #' #alpha = 0.025
 #' #c <- 2.072274
 #' #cvec <- c/gammaVec
-#' #loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,4),
-#' #      initNrep=1)
+#' #loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,4))
 #' #sbvec <- secondaryBoundary(alpha,tVec,cvec,loc,type=2,
-#' #       initIntvl=c(1,8),nRep=1)
+#' #       initIntvl=c(1,8))
 #'
 #' @references
 #'  O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
 #'
 #'  Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 #'
-secondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4),nRep=10) {
+secondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4)) {
   K <- length(tVec);
   gammaVec <- sqrt(tVec);
-  resultVec <- rep(0,nRep);
-  for (i in 1:nRep) {
+  resultVec <- rep(0,1);
+  for (i in 1:1) {
     result <- uniroot(secControl, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, alpha=alpha,cvec=cvec,gammaVec=gammaVec,ExtrmLoc=locPeak,type=type);
     resultVec[i] <- result$root;
   }
@@ -721,7 +714,6 @@ secondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4),n
 #  cVec: primary boundaries are given
 #  type: OBF 1, POC 2
 #  initIntvl: parameters for uniroot
-#  initNrep: number of replica
 # Output:
 #  Inital location of maximum (a number between 1 and K)
 # Dependency:
@@ -738,7 +730,6 @@ secondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4),n
 #' @param cvec primary group sequential boundary.
 #' @param type type of the test procedure for the secondary endpoint. O'Brien- Fleming (OBF) type error spending funciton is 1, Pocock (POC) type error spending funciton is 2.
 #' @param initIntvl computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.
-#' @param initNrep computing paramter, number of replica.
 #' @return location of maximum, a number between 1 and the number of interims.
 #'
 #' @details
@@ -758,19 +749,19 @@ secondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4),n
 #' #alpha = 0.025;
 #' #cvec.obf <- bounds(tVec,iuse=c(1),alpha=c(alpha));
 #' #cvec <- cvec.obf$upper.bounds;
-#' #loc <- ldInitLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(0.9,4),initNrep=1)
+#' #loc <- ldInitLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(0.9,4))
 #'
 #' @references
 #'  Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 #'
 #'
-ldInitLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(0.8,4),initNrep=10) {
+ldInitLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(0.8,4)) {
   K <- length(tVec);
   gammaVec <- sqrt(tVec);
-  locVec <- rep(0,initNrep);
-  for (j in 1:initNrep) {
+  locVec <- rep(0,1);
+  for (j in 1:1) {
     resultVec <- rep(0,K); # Need to be predefined, otherwise the program does not work
     for (i in 1:K) {
       result <- uniroot(ldSecControl,lower=initIntvl[1]*alpha,upper=initIntvl[2]*alpha,tol=2.5e-16,alpha=alpha,cvec=cvec,tVec=tVec,ExtrmLoc=i,type=type);
@@ -797,7 +788,6 @@ ldInitLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(0.8,4),initNrep=10
 #  locPeak: location of maximum, returned by function initLocPeak
 #  type: OBF 1, POC 2
 #  initIntvl: parameters for uniroot
-#  nRep: number of replica
 # Output:
 #  boundary vector
 # Dependency:
@@ -816,7 +806,6 @@ ldInitLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(0.8,4),initNrep=10
 #' @param locPeak location of maximum, a number between 1 and the number of interims.
 #' @param type type of the test procedure for the secondary endpoint. O'Brien- Fleming (OBF) type error spending funciton is 1, Pocock (POC) type error spending funciton is 2.
 #' @param initIntvl computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.
-#' @param nRep computing paramter, number of replica.
 #' @return refined secondary boundaries.
 #'
 #' @details
@@ -837,18 +826,18 @@ ldInitLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(0.8,4),initNrep=10
 #' #cvec.obf <- bounds(tVec,iuse=c(1),alpha=c(alpha));
 #' #cvec <- cvec.obf$upper.bounds;
 #' #secbound <- ldSecondaryBoundary(alpha,tVec,cvec,locPeak=4,type=2,
-#' #    initIntvl=c(0.8,8),nRep=1)
+#' #    initIntvl=c(0.8,8))
 #'
 #' @references
 #'  Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 #'
-ldSecondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(0.6,4),nRep=10) {
+ldSecondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(0.6,4)) {
   K <- length(tVec);
   gammaVec <- sqrt(tVec);
-  resultVec <- rep(0,nRep);
-  for (i in 1:nRep) {
+  resultVec <- rep(0,1);
+  for (i in 1:1) {
     result <- uniroot(ldSecControl, lower = initIntvl[1]*alpha, upper = initIntvl[2]*alpha, tol = 2.5e-16, alpha=alpha,cvec=cvec,tVec=tVec,ExtrmLoc=locPeak,type=type);
     resultVec[i] <- result$root;
   }
@@ -877,7 +866,6 @@ ldSecondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(0.6,
 #  locPeak: location of maximum, returned by function initLocPeak
 #  type: OBF 1, POC 2
 #  initIntvl: parameters for uniroot
-#  nRep: number of replica
 # Output:
 #  nominal significance
 # Dependency:
@@ -894,7 +882,6 @@ ldSecondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(0.6,
 #' @param locPeak location of maximum, a number between 1 and the number of interims.
 #' @param type O'Brien- Fleming (OBF) type error spending funciton is 1, Pocock (POC) type error spending funciton is 2.
 #' @param initIntvl computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.
-#' @param nRep computing paramter, number of replica.
 #' @return nominal significance of the secondary group sequential boundary.
 #'
 #' @details
@@ -918,18 +905,18 @@ ldSecondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(0.6,
 #' #cvec.obf <- bounds(tVec,iuse=c(1),alpha=c(alpha));
 #' #cvec <- cvec.obf$upper.bounds;
 #' #alphaprime <- ldNominalSig(alpha,tVec,cvec,locPeak=4,type=2,
-#' #      initIntvl=c(1,4),nRep=1)
+#' #      initIntvl=c(1,4))
 #'
 #' @references
 #'  Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 #'
-ldNominalSig <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4),nRep=20) {
+ldNominalSig <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4)) {
   K <- length(tVec);
   gammaVec <- sqrt(tVec);
-  resultVec <- rep(0,nRep);
-  for (i in 1:nRep) {
+  resultVec <- rep(0,1);
+  for (i in 1:1) {
     result <- uniroot(ldSecControl, lower = initIntvl[1]*alpha, upper = initIntvl[2]*alpha, tol = 2.5e-16, alpha=alpha,cvec=cvec,tVec=tVec,ExtrmLoc=locPeak,type=type);
     resultVec[i] <- result$root;
   }
@@ -983,7 +970,7 @@ ldNominalSig <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4),nRep=2
 #'
 #'  Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 #'
 nominalSig <- function (gammaVec,cvec) {
   K <- length(gammaVec);
@@ -991,7 +978,7 @@ nominalSig <- function (gammaVec,cvec) {
   upperB <- cvec; #print(upperB)
   meanV <- rep(0,K);
   corrM <- genCorrMat(gammaVec,1); #print(corrM)
-  result <- pmvnorm(lowerB, upperB, meanV, corrM);
+  result <- pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
   return(1 - result[1]);
 }
 # End of function primaryBoundary
@@ -1008,7 +995,6 @@ nominalSig <- function (gammaVec,cvec) {
 #     for function primaryBoundary or function ldPrimaryBoundary
 #  primaryOBF: TRUE for OBF, FALSE for POC
 #  secondaryOBF: TRUE for OBF, FALSE for POC
-#  nRep: number of replica
 #  digits: number of digits for output,
 #  printOut: TRUE for printing the boundaries.
 # Output:
@@ -1031,18 +1017,13 @@ nominalSig <- function (gammaVec,cvec) {
 #' @param tVec vector of relative information levels. The last element in the vector is 1.
 #' @param primaryOBF type of primary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.
 #' @param secondaryOBF type of secondary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.
-#' @param nRepVec computing paramter, number of replica, a vector of four numbers.
 #' @param initIntvl computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.
 #' @return a result list including standard refined secondary boundary and the nominal significance for the secondary endpoint.
 #'
 #' @details
 #' This function uses the standard approach (O'Brien and Fleming 1979, Pocock 1977),
 #' and gives a list including refined secondary boundary and the nominal significance for the secondary endpoint.
-#' There are two computing parameters \code{nRepVec} and \code{initIntvl}. Parameter \code{nRepVec} includes four numbers:
-#' \code{nRepVec[1]} is the number of replica for calculating primary boundaries,
-#' \code{nRepVec[2]} is the number of replica for searching the location of peak,
-#' \code{nRepVec[3]} is the number of replica for calculating secondary boundaries,
-#' \code{nRepVec[4]} is the number of replica for calculating the nominal significance.
+#' There is a computing parameter \code{initIntvl}. 
 #' Parameter \code{initIntvl} contains the end-points of the interval to be searched for the root.
 #' The lower end point should choose a number around 1,
 #' and the upper end point should choose a number between 4 and 10.
@@ -1058,7 +1039,7 @@ nominalSig <- function (gammaVec,cvec) {
 #' #require(mvtnorm)
 #' #require(ldbounds)
 #' #result <- secondaryBoundaryVecOrig(alpha=0.025,tVec=c(1/2,1),primaryOBF=TRUE,
-#' #        secondaryOBF=FALSE, nRepVec=c(1,1,1,1),initIntvl=c(1,4))
+#' #        secondaryOBF=FALSE, initIntvl=c(1,4))
 #' #result$secondaryBoundary
 #' #result$nomialSignificance
 #'
@@ -1075,23 +1056,24 @@ nominalSig <- function (gammaVec,cvec) {
 #'
 #'  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48. 
 #'
-secondaryBoundaryVecOrig  <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALSE,nRepVec=c(10,10,10,10),initIntvl=c(1,8)) {
+secondaryBoundaryVecOrig  <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALSE,initIntvl=c(1,8)) {
+  #
   K <- length(tVec);
   gammaVec <- sqrt(tVec);
   if (primaryOBF == secondaryOBF) {
-    bndyVec <- primaryBoundaryVec(alpha,tVec,OBF=primaryOBF,LanDeMets=FALSE,nRep=nRepVec[1],digits=10,printOut=FALSE,initIntvl=initIntvl);
+    bndyVec <- primaryBoundaryVec(alpha,tVec,OBF=primaryOBF,LanDeMets=FALSE,digits=10,printOut=FALSE,initIntvl=initIntvl);
     nomialSigLvl <- alpha;
   } else {
-    primaryBndyVec <- primaryBoundaryVec(alpha=alpha,tVec=tVec,OBF=primaryOBF,LanDeMets=FALSE,nRep=nRepVec[2],digits=10,printOut=FALSE,initIntvl=initIntvl);
+    primaryBndyVec <- primaryBoundaryVec(alpha=alpha,tVec=tVec,OBF=primaryOBF,LanDeMets=FALSE,digits=10,printOut=FALSE,initIntvl=initIntvl);
     if (secondaryOBF == TRUE) {
       sType = 1;
     } else {
       sType = 2;
     }
-    peakLocation <- initLocPeak(alpha=alpha,tVec=tVec,cvec=primaryBndyVec,type=sType,initIntvl=initIntvl,initNrep=nRepVec[3]);
-    bndyVec <- secondaryBoundary(alpha,tVec,cvec=primaryBndyVec,locPeak=peakLocation,type=sType,initIntvl=initIntvl,nRep=nRepVec[4]);
+    peakLocation <- initLocPeak(alpha=alpha,tVec=tVec,cvec=primaryBndyVec,type=sType,initIntvl=initIntvl);
+    bndyVec <- secondaryBoundary(alpha,tVec,cvec=primaryBndyVec,locPeak=peakLocation,type=sType,initIntvl=initIntvl);
     #print(bndyVec)
     #
     nomialSigLvl <- nominalSig(gammaVec=gammaVec,cvec=bndyVec);
@@ -1117,18 +1099,13 @@ secondaryBoundaryVecOrig  <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=F
 #' @param tVec vector of relative information levels. The last element in the vector is 1.
 #' @param primaryOBF type of primary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.
 #' @param secondaryOBF type of secondary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.
-#' @param nRepVec computing paramter, number of replica, a vector of four numbers.
 #' @param initIntvl computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.
 #' @return a result list including Lan-DeMets refined secondary boundary and the nominal significance for the secondary endpoint.
 #'
 #' @details
 #' This function uses the Lan-DeMets error spending approach,
 #' and gives a list including refined secondary boundary and the nominal significance for the secondary endpoint.
-#' There are two computing parameters \code{nRepVec} and \code{initIntvl}. Parameter \code{nRepVec} includes four numbers:
-#' \code{nRepVec[1]} is the number of replica for calculating primary boundaries,
-#' \code{nRepVec[2]} is the number of replica for searching the location of peak,
-#' \code{nRepVec[3]} is the number of replica for calculating secondary boundaries,
-#' \code{nRepVec[4]} is the number of replica for calculating the nominal significance.
+#' There is a computing parameter \code{initIntvl}. 
 #' Parameter \code{initIntvl} contains the end-points of the interval to be searched for the root.
 #' For Lan-DeMets error spending approach, the lower end point should choose a number slightly less than 1,
 #' and the upper end point should choose a number between 4 and 10.
@@ -1144,7 +1121,7 @@ secondaryBoundaryVecOrig  <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=F
 #' #require(mvtnorm)
 #' #require(ldbounds)
 #' #result <- secondaryBoundaryVecLD(alpha=0.025,tVec=c(1/2,1),primaryOBF=TRUE,
-#' #        secondaryOBF=FALSE, nRepVec=c(1,1,1,1),initIntvl=c(0.8,6))
+#' #        secondaryOBF=FALSE,initIntvl=c(0.8,6))
 #' #result$secondaryBoundary
 #' #result$nomialSignificance
 #'
@@ -1163,13 +1140,14 @@ secondaryBoundaryVecOrig  <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=F
 #'
 #'  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 #'
-secondaryBoundaryVecLD <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALSE,nRepVec=c(10,10,10,10),initIntvl=c(0.8,8)) {
+secondaryBoundaryVecLD <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALSE,initIntvl=c(0.8,8)) {
+#
   K <- length(tVec);
   gammaVec <- sqrt(tVec);
   if (primaryOBF == secondaryOBF) {
-    bndyVec <- primaryBoundaryVec(alpha,tVec,OBF=primaryOBF,LanDeMets=TRUE,nRep=nRepVec[1],digits=10,printOut=FALSE,initIntvl=initIntvl);
+    bndyVec <- primaryBoundaryVec(alpha,tVec,OBF=primaryOBF,LanDeMets=TRUE,digits=10,printOut=FALSE,initIntvl=initIntvl);
     nomialSigLvl <- alpha;
   } else {
     if (primaryOBF == TRUE) {
@@ -1184,10 +1162,10 @@ secondaryBoundaryVecLD <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALS
     }
     cvec.bounds <- bounds(tVec,iuse=c(pType),alpha=c(alpha));
     cvec <- cvec.bounds$upper.bounds;
-    peakLocation <- ldInitLocPeak(alpha=alpha,tVec=tVec,cvec=cvec,type=sType,initIntvl=initIntvl,initNrep=nRepVec[2]);
-    bndyVec <- ldSecondaryBoundary(alpha=alpha,tVec=tVec,cvec=cvec,locPeak=peakLocation,type=sType,initIntvl=initIntvl,nRep=nRepVec[3]);
+    peakLocation <- ldInitLocPeak(alpha=alpha,tVec=tVec,cvec=cvec,type=sType,initIntvl=initIntvl);
+    bndyVec <- ldSecondaryBoundary(alpha=alpha,tVec=tVec,cvec=cvec,locPeak=peakLocation,type=sType,initIntvl=initIntvl);
     #
-    nomialSigLvl <- ldNominalSig(alpha=alpha,tVec=tVec,cvec=cvec,locPeak=peakLocation,type=sType,initIntvl=initIntvl,nRep=nRepVec[4]);
+    nomialSigLvl <- ldNominalSig(alpha=alpha,tVec=tVec,cvec=cvec,locPeak=peakLocation,type=sType,initIntvl=initIntvl);
   }
   resultlist <- list("secondaryBoundary" = bndyVec, "nomialSignificance" = nomialSigLvl)
   return(resultlist)
@@ -1211,17 +1189,12 @@ secondaryBoundaryVecLD <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALS
 #' @param pOBF type of primary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.
 #' @param sOBF type of secondary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.
 #' @param LanDeMets type of boundary, \code{TRUE} is the error spending approach, \code{FALSE} is the original approach.
-#' @param nRepVec computing paramter, number of replica, a vector of four numbers.
 #' @param initIntvl computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.
 #' @return a result list including refined secondary boundary and the nominal significance for the secondary endpoint.
 #'
 #' @details
 #' This function gives a list including refined secondary boundary and the nominal significance for the secondary endpoint.
-#' There are two computing parameters \code{nRepVec} and \code{initIntvl}. Parameter \code{nRepVec} includes four numbers:
-#' \code{nRepVec[1]} is the number of replica for calculating primary boundaries,
-#' \code{nRepVec[2]} is the number of replica for searching the location of peak,
-#' \code{nRepVec[3]} is the number of replica for calculating secondary boundaries,
-#' \code{nRepVec[4]} is the number of replica for calculating the nominal significance.
+#' There are a computing parameter \code{initIntvl}. 
 #' Parameter \code{initIntvl} contains the end-points of the interval to be searched for the root.
 #' For Lan-DeMets error spending approach, the lower end point should choose a number slightly less than 1,
 #' and the upper end point should choose a number between 4 and 10.
@@ -1237,7 +1210,7 @@ secondaryBoundaryVecLD <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALS
 #' #require(mvtnorm)
 #' #require(ldbounds)
 #' #result <- secondaryBoundaryVec(alpha=0.025,tVec=c(1/2,1),pOBF=TRUE,sOBF=FALSE,
-#' #       LanDeMets=FALSE,nRepVec=c(1,1,1,1),initIntvl=c(0.8,5))
+#' #       LanDeMets=FALSE,initIntvl=c(0.8,5))
 #' #result$secondaryBoundary
 #' #result$nomialSignificance
 #'
@@ -1256,14 +1229,15 @@ secondaryBoundaryVecLD <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALS
 #'
 #'  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48. 
 #'
-secondaryBoundaryVec <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,nRepVec=c(10,10,10,10),initIntvl=c(0.8,8)) {
+secondaryBoundaryVec <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,initIntvl=c(0.8,8)) {
+  #
   if (LanDeMets == FALSE) {
-    bdns <- secondaryBoundaryVecOrig(alpha=alpha,tVec=tVec,primaryOBF=pOBF,secondaryOBF=sOBF,nRepVec=nRepVec,initIntvl=initIntvl);
+    bdns <- secondaryBoundaryVecOrig(alpha=alpha,tVec=tVec,primaryOBF=pOBF,secondaryOBF=sOBF,initIntvl=initIntvl);
     # bdns: boundaries and nominal significance
   } else {
-    bdns <- secondaryBoundaryVecLD(alpha=alpha,tVec=tVec,primaryOBF=pOBF,secondaryOBF=sOBF,nRepVec=nRepVec,initIntvl=initIntvl);
+    bdns <- secondaryBoundaryVecLD(alpha=alpha,tVec=tVec,primaryOBF=pOBF,secondaryOBF=sOBF,initIntvl=initIntvl);
   }
   return(bdns);
 }
@@ -1286,15 +1260,11 @@ secondaryBoundaryVec <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALS
 #' @param pOBF type of primary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.
 #' @param sOBF type of secondary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.
 #' @param LanDeMets type of boundary, \code{TRUE} is the error spending approach, \code{FALSE} is the original approach.
-#' @param SpeedQuality quality-speed tradeoff parameter. Choices are \code{fastest}, \code{fast}, \code{acceptable}, \code{normal}, \code{good}, and \code{stable}.
 #' @param digits number of digits after decimal point for primary and secondary boundaries.
 #' @return a result list including primary boundary, refined secondary boundary, and the nominal significance for the secondary endpoint.
 #'
 #' @details
 #' This function gives a list including primary boundary, refined secondary boundary, and the nominal significance for the secondary endpoint.
-#' When the choice of parameter \code{SpeedQuality} is \code{fastest}, \code{fast}, \code{acceptable}, or \code{normal},
-#' the default number of digits for boundaries is 2. When the choice of parameter \code{SpeedQuality} is \code{good} or \code{stable}, the default number of digits for boundaries is 2.
-#' The number of digits for boundaries after decimal point can also be specified through parameter \code{digits}.
 #' The number of digits for the nominal significance depends on parameter \code{alpha}.
 #'
 #' @export
@@ -1305,7 +1275,7 @@ secondaryBoundaryVec <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALS
 #' @examples
 #' require(mvtnorm)
 #' require(ldbounds)
-#' result <- refinedBoundary(alpha=0.05,tVec=c(0.2,0.6,1),SpeedQuality="fastest")
+#' result <- refinedBoundary(alpha=0.05,tVec=c(0.2,0.6,1))
 #' result$primaryBoundary
 #' result$secondaryBoundary
 #' result$nomialSignificance
@@ -1325,39 +1295,20 @@ secondaryBoundaryVec <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALS
 #'
 #'  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48
 #'
-refinedBoundary <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,SpeedQuality="fast",digits=2) {
-  if (SpeedQuality == "fastest") {
-    nRepVec = c(1,1,1,1);
-    pDigits = 2;
-  } else if (SpeedQuality == "fast") {
-    nRepVec = c(2,2,2,2);
-    pDigits = 2;
-  } else if (SpeedQuality == "acceptable") {
-    nRepVec = c(5,5,5,5);
-    pDigits = 2;
-  } else if (SpeedQuality == "normal") {
-    nRepVec = c(10,10,10,10);
-    pDigits = 2;
-  } else if (SpeedQuality == "good") {
-    nRepVec = c(25,25,25,25);
-    pDigits = 3;
-  } else if (SpeedQuality == "stable") {
-    nRepVec = c(100,100,100,100);
-    pDigits = 3;
-  } else {
-    print("The choices of Speed and Quality option include: fastest, fast, acceptable, normal, good, and stable.");
-  }
+refinedBoundary <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,digits=2) {
+  #
   initIntvl=c(0.8,8);
-  pd <- primaryBoundaryVec(alpha=alpha,tVec=tVec,OBF=pOBF,LanDeMets=LanDeMets,nRep=nRepVec[1],digits=10,printOut=FALSE,initIntvl=initIntvl);
-  bdns <- secondaryBoundaryVec(alpha=alpha,tVec=tVec,pOBF=pOBF,sOBF=sOBF,LanDeMets=LanDeMets,nRepVec=nRepVec,initIntvl=initIntvl);
+  pd <- primaryBoundaryVec(alpha=alpha,tVec=tVec,OBF=pOBF,LanDeMets=LanDeMets,digits=10,printOut=FALSE,initIntvl=initIntvl);
+  bdns <- secondaryBoundaryVec(alpha=alpha,tVec=tVec,pOBF=pOBF,sOBF=sOBF,LanDeMets=LanDeMets,initIntvl=initIntvl);
   #
   rawlist <- list("primaryBoundary" = pd, "secondaryBoundary" = bdns$secondaryBoundary, "nomialSignificance" = bdns$nomialSignificance)
-  dgt = max(pDigits,digits);
+  dgt = digits;
   rpd <- round(pd, dgt);
   rsd <- round(bdns$secondaryBoundary, dgt);
   nsdgt <- 3+round(log10(1/alpha));
+  nsdgt <- max(dgt, nsdgt); 
   rns <- round(bdns$nomialSignificance, nsdgt);
   resultlist <- list("primaryBoundary" = rpd, "secondaryBoundary" = rsd, "nomialSignificance" = rns)
   return(resultlist)
@@ -1381,14 +1332,12 @@ refinedBoundary <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,Spe
 #' @param pOBF type of primary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.
 #' @param sOBF type of secondary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.
 #' @param LanDeMets type of boundary, \code{TRUE} is the error spending approach, \code{FALSE} is the original approach.
-#' @param SpeedQuality quality-speed tradeoff parameter. Choices are \code{fastest}, \code{fast}, \code{acceptable}, \code{normal}, \code{good}, and \code{stable}.
 #' @param digits number of digits after decimal point to display in the table.
 #' @return a TeX format table including both primary boundary and refined secondary boundary.
 #'
 #' @details
-#' This function gives a TeX format table including both primary boundary and refined secondary boundary. When the choice of parameter \code{SpeedQuality} is \code{fastest}, \code{fast}, \code{acceptable}, or \code{normal},
-#' the default number of digits is 2. When the choice of parameter \code{SpeedQuality} is \code{good} or \code{stable}, the default number of digits is 2.
-#' The number of digits after decimal point can also be specified through parameter \code{digits}.
+#' This function gives a TeX format table including both primary boundary and refined secondary boundary. 
+#' The number of digits after decimal point can be specified through parameter \code{digits}.
 #'
 #' @export
 #' @import mvtnorm
@@ -1416,74 +1365,17 @@ refinedBoundary <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,Spe
 #'
 #'  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 #'
-psbTeXtable <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,SpeedQuality="fast",digits=2) {
-  result <- refinedBoundary(alpha=alpha,tVec=tVec,pOBF=pOBF,sOBF=sOBF,LanDeMets=LanDeMets,SpeedQuality=SpeedQuality,digits=digits);
+psbTeXtable <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,digits=2) {
+  #
+  result <- refinedBoundary(alpha=alpha,tVec=tVec,pOBF=pOBF,sOBF=sOBF,LanDeMets=LanDeMets,digits=digits);
   psb <- data.frame(result$primaryBoundary, result$secondaryBoundary);
   colnames(psb) <- c("Primary Boundary", "Refined Secondary Boundary");
   print(xtable(psb,label = 'tab:psb',
-               caption = 'Primary Boundary and Refined Secondary Boundary'));
+               caption = 'Primary Boundary and Refined Secondary Boundary', digits=digits));
 }
 # End of function psbTeXtable
-#
-
-#
-# Function Extra
-#
-# Fucntion p.adjust.gtxr
-#
-# Jiangtao Gou
-# 2016-09-24
-# Given a set of p-values, returns p-values adjusted using one of several methods. The default method is "gtxr".
-# Example: p.adjust.gtxr(c(0.002,0.007,0.005,0.024,0.022,0.009,0.007,0.036,0.060,0.035), method = "gtxr")
-# Ref: Gou J, Tamhane AC, Xi D, Rom D. A class of improved hybrid Hochberg-Hommel type step-up multiple test procedures. Biometrika. 2014; 101:899–911.
-#
-
-#' Adjust P-values for Multiple Test Procedures
-#'
-#' Given a set of p-values, returns adjusted p-values, including the hybrid Hochberg–Hommel procedure (Gou et al., 2014).
-#'
-#'
-#' #
-#' @param p vector of p-values.
-#' @param method multiplicity correction method, "gtxr" is the hybrid Hochberg–Hommel method, other methods include: "gtxr", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none".
-#' @param n number of p-values.
-#' @return a vector of corrected p-values.
-#' @author Jiangtao Gou
-#' @references
-#' Gou, J., Tamhane, A. C., Xi, D., and Rom. D. (2014). A class of improved hybrid Hochberg-Hommel type step-up multiple test procedures. \emph{Biometrika} \bold{101}, 899-911.
-#' @details
-#' Given a set of p-values, returns p-values adjusted using one of several methods. The default method is "gtxr". Other adjustment methods have been included in function p.adjust in R package stats.
-#' @examples
-#'  pvalues.raw <- c(0.002,0.007,0.005,0.024,0.022,0.009,0.007,0.036,0.060,0.035)
-#'  p.adj <- p.adjust.gtxr(pvalues.raw, method = "gtxr")
-#' @seealso \code{p.adjust}
-#' @export
-#' @import stats
-#'
-p.adjust.gtxr <- function (p, method = "gtxr", n = length(p)) {
-  if (method == "holm" || method == "hochberg" || method == "hommel" || method == "bonferroni" || method == "BH" || method ==  "BY" || method == "fdr" || method ==  "none") {
-    result <- p.adjust(p,method,n);
-    return(result);
-  } else if (method == "gtxr") {
-    cvec <- (2:(n+1))/(2*(1:n));
-    dvec <- 1/(1:n);
-    p.sorted.adjust <- rep(0,n);
-    result <- rep(0,n);
-    p.sorted <- sort(p,decreasing = TRUE, index.return = TRUE);
-    for (i in 1:n) {
-      p.sorted.adjust[i] <- min(pmax(p.sorted$x[1:i]/cvec[1:i], p.sorted$x[i]/dvec[1:i]));
-    }
-    result[p.sorted$ix] <- p.sorted.adjust[1:n];
-    return(result);
-  } else {
-    print("Methods include: holm, hochberg, hommel, bonferroni, BH, BY, fdr, none, gtxr.");
-    return(p);
-  }
-}
-#
-# End of Fucntion p.adjust.gtxr
 #
 
 ##########

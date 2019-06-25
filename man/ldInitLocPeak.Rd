@@ -4,8 +4,7 @@
 \alias{ldInitLocPeak}
 \title{Find the Location of Maximum, Error Spending Approach}
 \usage{
-ldInitLocPeak(alpha, tVec, cvec, type = 2, initIntvl = c(0.8, 4),
-  initNrep = 10)
+ldInitLocPeak(alpha, tVec, cvec, type = 2, initIntvl = c(0.8, 4))
 }
 \arguments{
 \item{alpha}{type I error.}
@@ -17,8 +16,6 @@ ldInitLocPeak(alpha, tVec, cvec, type = 2, initIntvl = c(0.8, 4),
 \item{type}{type of the test procedure for the secondary endpoint. O'Brien- Fleming (OBF) type error spending funciton is 1, Pocock (POC) type error spending funciton is 2.}
 
 \item{initIntvl}{computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.}
-
-\item{initNrep}{computing paramter, number of replica.}
 }
 \value{
 location of maximum, a number between 1 and the number of interims.
@@ -37,13 +34,13 @@ This function searches the location of maximal type I error of secondary endpoin
 #alpha = 0.025;
 #cvec.obf <- bounds(tVec,iuse=c(1),alpha=c(alpha));
 #cvec <- cvec.obf$upper.bounds;
-#loc <- ldInitLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(0.9,4),initNrep=1)
+#loc <- ldInitLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(0.9,4))
 
 }
 \references{
 Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+ Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 }
 \seealso{
 \code{ldSecondaryBoundary}, \code{initLocBeak}

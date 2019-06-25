@@ -5,7 +5,7 @@
 \title{Calculate Refined Secondary Boundaries and Nominal Significance, Standard Approach}
 \usage{
 secondaryBoundaryVecOrig(alpha, tVec, primaryOBF = TRUE,
-  secondaryOBF = FALSE, nRepVec = c(10, 10, 10, 10), initIntvl = c(1, 8))
+  secondaryOBF = FALSE, initIntvl = c(1, 8))
 }
 \arguments{
 \item{alpha}{type I error probability.}
@@ -15,8 +15,6 @@ secondaryBoundaryVecOrig(alpha, tVec, primaryOBF = TRUE,
 \item{primaryOBF}{type of primary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.}
 
 \item{secondaryOBF}{type of secondary boundary, \code{TURE} is the O'Brien-Fleming boundary, \code{FALSE} is the Pocock boundary.}
-
-\item{nRepVec}{computing paramter, number of replica, a vector of four numbers.}
 
 \item{initIntvl}{computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.}
 }
@@ -29,11 +27,7 @@ Standard refined secondary boundaries, and nominal significance for the secondar
 \details{
 This function uses the standard approach (O'Brien and Fleming 1979, Pocock 1977),
 and gives a list including refined secondary boundary and the nominal significance for the secondary endpoint.
-There are two computing parameters \code{nRepVec} and \code{initIntvl}. Parameter \code{nRepVec} includes four numbers:
-\code{nRepVec[1]} is the number of replica for calculating primary boundaries,
-\code{nRepVec[2]} is the number of replica for searching the location of peak,
-\code{nRepVec[3]} is the number of replica for calculating secondary boundaries,
-\code{nRepVec[4]} is the number of replica for calculating the nominal significance.
+There is a computing parameter \code{initIntvl}. 
 Parameter \code{initIntvl} contains the end-points of the interval to be searched for the root.
 The lower end point should choose a number around 1,
 and the upper end point should choose a number between 4 and 10.
@@ -42,7 +36,7 @@ and the upper end point should choose a number between 4 and 10.
 #require(mvtnorm)
 #require(ldbounds)
 #result <- secondaryBoundaryVecOrig(alpha=0.025,tVec=c(1/2,1),primaryOBF=TRUE,
-#        secondaryOBF=FALSE, nRepVec=c(1,1,1,1),initIntvl=c(1,4))
+#        secondaryOBF=FALSE, initIntvl=c(1,4))
 #result$secondaryBoundary
 #result$nomialSignificance
 
@@ -60,7 +54,7 @@ Glimm, E., Maurer, W., and Bretz, F. (2010). Hierarchical testing of multiple en
 
  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+ Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 }
 \seealso{
 \code{secondaryBoundaryVec}, \code{secondaryBoundaryVecLD}

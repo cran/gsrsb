@@ -4,8 +4,8 @@
 \alias{secondaryBoundary}
 \title{Calculate the Refined Secondary Boundaries, Standard OBF and POC}
 \usage{
-secondaryBoundary(alpha, tVec, cvec, locPeak, type = 2, initIntvl = c(1, 4),
-  nRep = 10)
+secondaryBoundary(alpha, tVec, cvec, locPeak, type = 2,
+  initIntvl = c(1, 4))
 }
 \arguments{
 \item{alpha}{type I error.}
@@ -19,8 +19,6 @@ secondaryBoundary(alpha, tVec, cvec, locPeak, type = 2, initIntvl = c(1, 4),
 \item{type}{type of the test procedure for the secondary endpoint. O'Brien- Fleming (OBF) type error spending funciton is 1, Pocock (POC) type error spending funciton is 2.}
 
 \item{initIntvl}{computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.}
-
-\item{nRep}{computing paramter, number of replica.}
 }
 \value{
 standard O'Brien-Fleming and Pocock refined secondary boundaries.
@@ -39,10 +37,9 @@ This function calculates the standard (origiinal) O'Brien-Fleming (OBF) and Poco
 #alpha = 0.025
 #c <- 2.072274
 #cvec <- c/gammaVec
-#loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,4),
-#      initNrep=1)
+#loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,4))
 #sbvec <- secondaryBoundary(alpha,tVec,cvec,loc,type=2,
-#       initIntvl=c(1,8),nRep=1)
+#       initIntvl=c(1,8))
 
 }
 \references{
@@ -50,7 +47,7 @@ O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clin
 
  Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+ Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 }
 \seealso{
 \code{ldSecondaryBoundary}, \code{initLocBeak}

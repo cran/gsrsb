@@ -26,7 +26,7 @@ difference between alpha and the calculated error rate.
 Calculate the difference between the error rate and significance level for the secondary endpoint, standard (original) approach.
 }
 \references{
-Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 }
 \seealso{
 \code{ldSecControl}

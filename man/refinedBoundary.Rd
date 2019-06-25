@@ -4,8 +4,8 @@
 \alias{refinedBoundary}
 \title{Summarize Primary and Refined Secondary Boundaries, Nominal Significance}
 \usage{
-refinedBoundary(alpha, tVec, pOBF = TRUE, sOBF = FALSE, LanDeMets = FALSE,
-  SpeedQuality = "fast", digits = 2)
+refinedBoundary(alpha, tVec, pOBF = TRUE, sOBF = FALSE,
+  LanDeMets = FALSE, digits = 2)
 }
 \arguments{
 \item{alpha}{type I error probability.}
@@ -18,8 +18,6 @@ refinedBoundary(alpha, tVec, pOBF = TRUE, sOBF = FALSE, LanDeMets = FALSE,
 
 \item{LanDeMets}{type of boundary, \code{TRUE} is the error spending approach, \code{FALSE} is the original approach.}
 
-\item{SpeedQuality}{quality-speed tradeoff parameter. Choices are \code{fastest}, \code{fast}, \code{acceptable}, \code{normal}, \code{good}, and \code{stable}.}
-
 \item{digits}{number of digits after decimal point for primary and secondary boundaries.}
 }
 \value{
@@ -30,15 +28,12 @@ Primary boundaries, refined secondary boundaries, and nominal significance for t
 }
 \details{
 This function gives a list including primary boundary, refined secondary boundary, and the nominal significance for the secondary endpoint.
-When the choice of parameter \code{SpeedQuality} is \code{fastest}, \code{fast}, \code{acceptable}, or \code{normal},
-the default number of digits for boundaries is 2. When the choice of parameter \code{SpeedQuality} is \code{good} or \code{stable}, the default number of digits for boundaries is 2.
-The number of digits for boundaries after decimal point can also be specified through parameter \code{digits}.
 The number of digits for the nominal significance depends on parameter \code{alpha}.
 }
 \examples{
 require(mvtnorm)
 require(ldbounds)
-result <- refinedBoundary(alpha=0.05,tVec=c(0.2,0.6,1),SpeedQuality="fastest")
+result <- refinedBoundary(alpha=0.05,tVec=c(0.2,0.6,1))
 result$primaryBoundary
 result$secondaryBoundary
 result$nomialSignificance
@@ -59,7 +54,7 @@ Glimm, E., Maurer, W., and Bretz, F. (2010). Hierarchical testing of multiple en
 
  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+ Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48
 }
 \author{
 Jiangtao Gou

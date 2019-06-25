@@ -5,7 +5,7 @@
 \title{Calculate Refined Secondary Boundaries and Nominal Significance}
 \usage{
 secondaryBoundaryVec(alpha, tVec, pOBF = TRUE, sOBF = FALSE,
-  LanDeMets = FALSE, nRepVec = c(10, 10, 10, 10), initIntvl = c(0.8, 8))
+  LanDeMets = FALSE, initIntvl = c(0.8, 8))
 }
 \arguments{
 \item{alpha}{type I error probability.}
@@ -18,8 +18,6 @@ secondaryBoundaryVec(alpha, tVec, pOBF = TRUE, sOBF = FALSE,
 
 \item{LanDeMets}{type of boundary, \code{TRUE} is the error spending approach, \code{FALSE} is the original approach.}
 
-\item{nRepVec}{computing paramter, number of replica, a vector of four numbers.}
-
 \item{initIntvl}{computing paramter, a pair of numbers containing the end-points of the interval to be searched for the root.}
 }
 \value{
@@ -30,11 +28,7 @@ Refined secondary boundaries, and nominal significance for the secondary endpoin
 }
 \details{
 This function gives a list including refined secondary boundary and the nominal significance for the secondary endpoint.
-There are two computing parameters \code{nRepVec} and \code{initIntvl}. Parameter \code{nRepVec} includes four numbers:
-\code{nRepVec[1]} is the number of replica for calculating primary boundaries,
-\code{nRepVec[2]} is the number of replica for searching the location of peak,
-\code{nRepVec[3]} is the number of replica for calculating secondary boundaries,
-\code{nRepVec[4]} is the number of replica for calculating the nominal significance.
+There are a computing parameter \code{initIntvl}. 
 Parameter \code{initIntvl} contains the end-points of the interval to be searched for the root.
 For Lan-DeMets error spending approach, the lower end point should choose a number slightly less than 1,
 and the upper end point should choose a number between 4 and 10.
@@ -43,7 +37,7 @@ and the upper end point should choose a number between 4 and 10.
 #require(mvtnorm)
 #require(ldbounds)
 #result <- secondaryBoundaryVec(alpha=0.025,tVec=c(1/2,1),pOBF=TRUE,sOBF=FALSE,
-#       LanDeMets=FALSE,nRepVec=c(1,1,1,1),initIntvl=c(0.8,5))
+#       LanDeMets=FALSE,initIntvl=c(0.8,5))
 #result$secondaryBoundary
 #result$nomialSignificance
 
@@ -63,7 +57,7 @@ Glimm, E., Maurer, W., and Bretz, F. (2010). Hierarchical testing of multiple en
 
  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+ Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 }
 \seealso{
 \code{secondaryBoundaryVecLD}, \code{secondaryBoundaryVecOrig}

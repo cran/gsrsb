@@ -24,7 +24,7 @@ lower and upper bounds for programs calculating the secondary endpoint's type I 
 Generate lower and upper bounds for programs calculating the secondary endpoint's type I error when the correlation rho between the primary endpoint and the secondary endpoint equals 1.
 }
 \details{
-This function generates upper and lower bounds for further computation. For more details, refer to Tamhane et al. (2017+), section 4.2.
+This function generates upper and lower bounds for further computation. For more details, refer to Tamhane et al. (2018, Biometrics), section 4.2.
 }
 \examples{
 cvec <- rep(1.992,3)
@@ -35,7 +35,7 @@ uBoundary <- cdBoundary(cvec, dvec, gammaVec, dlt, upper=TRUE)
 
 }
 \references{
-Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 }
 \author{
 Jiangtao Gou

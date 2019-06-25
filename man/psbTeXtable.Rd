@@ -4,8 +4,8 @@
 \alias{psbTeXtable}
 \title{Summarize Primary and Refined Secondary Boundaries in a TeX table}
 \usage{
-psbTeXtable(alpha, tVec, pOBF = TRUE, sOBF = FALSE, LanDeMets = FALSE,
-  SpeedQuality = "fast", digits = 2)
+psbTeXtable(alpha, tVec, pOBF = TRUE, sOBF = FALSE,
+  LanDeMets = FALSE, digits = 2)
 }
 \arguments{
 \item{alpha}{type I error probability.}
@@ -18,8 +18,6 @@ psbTeXtable(alpha, tVec, pOBF = TRUE, sOBF = FALSE, LanDeMets = FALSE,
 
 \item{LanDeMets}{type of boundary, \code{TRUE} is the error spending approach, \code{FALSE} is the original approach.}
 
-\item{SpeedQuality}{quality-speed tradeoff parameter. Choices are \code{fastest}, \code{fast}, \code{acceptable}, \code{normal}, \code{good}, and \code{stable}.}
-
 \item{digits}{number of digits after decimal point to display in the table.}
 }
 \value{
@@ -29,9 +27,8 @@ a TeX format table including both primary boundary and refined secondary boundar
 Primary boundaries and refined secondary boundaries are listed in a TeX table.
 }
 \details{
-This function gives a TeX format table including both primary boundary and refined secondary boundary. When the choice of parameter \code{SpeedQuality} is \code{fastest}, \code{fast}, \code{acceptable}, or \code{normal},
-the default number of digits is 2. When the choice of parameter \code{SpeedQuality} is \code{good} or \code{stable}, the default number of digits is 2.
-The number of digits after decimal point can also be specified through parameter \code{digits}.
+This function gives a TeX format table including both primary boundary and refined secondary boundary. 
+The number of digits after decimal point can be specified through parameter \code{digits}.
 }
 \examples{
 #require(mvtnorm)
@@ -54,7 +51,7 @@ Glimm, E., Maurer, W., and Bretz, F. (2010). Hierarchical testing of multiple en
 
  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+ Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 }
 \author{
 Jiangtao Gou

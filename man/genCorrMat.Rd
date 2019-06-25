@@ -20,14 +20,14 @@ correlation matrix, K by K for primary endpoint, (K+1) by (K+1) for secondary en
 Generate correlation matrix between standardized sample mean test statistics for the two endpoint at different looks.
 }
 \details{
-This function generates correlation matrix between different mean statistics. For more details, refer to Tamhane et al. (2017+), section 2.
+This function generates correlation matrix between different mean statistics. For more details, refer to Tamhane et al. (2018, Biometrics), section 2.
 }
 \examples{
 corrMat <- genCorrMat(gammaVec=c(sqrt(1/3),sqrt(2/3),1), type=2, rhoPS = 0.3)
 
 }
 \references{
-Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 }
 \author{
 Jiangtao Gou
