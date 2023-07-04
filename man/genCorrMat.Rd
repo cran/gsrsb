@@ -23,11 +23,12 @@ Generate correlation matrix between standardized sample mean test statistics for
 This function generates correlation matrix between different mean statistics. For more details, refer to Tamhane et al. (2018, Biometrics), section 2.
 }
 \examples{
-corrMat <- genCorrMat(gammaVec=c(sqrt(1/3),sqrt(2/3),1), type=2, rhoPS = 0.3)
+corrMat <- genCorrMat(gammaVec=c(sqrt(1/3), sqrt(2/3), 1), type=2, rhoPS = 0.3)
 
 }
 \references{
 Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
+Tamhane, A. C., & Gou, J. (2022). Chapter 2 - Multiple test procedures based on p-values. In X. Cui, T. Dickhaus, Y. Ding, & J. C. Hsu (Eds.), \emph{Handbook of multiple comparisons} (Vol. 45, pp. 11–34).
 }
 \author{
 Jiangtao Gou

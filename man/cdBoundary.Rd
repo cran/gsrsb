@@ -36,6 +36,7 @@ uBoundary <- cdBoundary(cvec, dvec, gammaVec, dlt, upper=TRUE)
 }
 \references{
 Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
+Gou, J. (2022). Sample size optimization and initial allocation of the significance levels in group sequential trials with multiple endpoints. \emph{Biometrical Journal}, 64(2), 301–311.
 }
 \author{
 Jiangtao Gou

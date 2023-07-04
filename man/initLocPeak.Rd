@@ -27,22 +27,22 @@ Calculate the location of maximal tyep I error of the standard O'Brien-Fleming a
 This function search the location of the maximal point, in order to calculate the standard (origiinal) O'Brien-Fleming (OBF) and Pocock (POC) refined secondary boundaries.
 }
 \examples{
-#require(mvtnorm)
-#K <- 8
-#gammaVec <- sqrt((1:K)/K)
-#tVec <- gammaVec^2
-#alpha = 0.025
-#c <- 2.072274
-#cvec <- c/gammaVec
-#loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,3))
+require(mvtnorm)
+K <- 8
+gammaVec <- sqrt((1:K)/K)
+tVec <- gammaVec^2
+alpha <- 0.025
+c <- 2.072274
+cvec <- c/gammaVec
+loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,3))
 
 }
 \references{
 O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
 
- Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
+Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
+Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, to appear.
 }
 \seealso{
 \code{SecondaryBoundary}, \code{ldInitLocBeak}

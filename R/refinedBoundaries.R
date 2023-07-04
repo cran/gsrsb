@@ -1,19 +1,20 @@
 ##########
 # A gatekeeping test on a primary and a secondary endpoint in a group sequential design with multiple interim looks
 # R program for Refined Boundaries
-# Version 1.1
+# Version 1.2
 # Programmer: Jiangtao Gou
 # Version 1.0: 2017/Mar/14-Apr/12
 # Version 1.1: 2019/Jun/24
+# Version 1.2: 2023/Jun/26
 # Reference: Tamhane AC, Gou J, Jennison C, Mehta CR, Curto T.
 #   A Gatekeeping Test on a Primary and a Secondary Endpoint in a Group
 #   Sequential Design with Multiple Interim Looks.
 #   Biometrics (2018).
 ##########
 
-require(mvtnorm)
-require(ldbounds)
-require(xtable)
+# require(mvtnorm)
+# require(ldbounds)
+# require(xtable)
 
 #
 # Function 1
@@ -48,6 +49,7 @@ require(xtable)
 #'
 #' @references
 #'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
+#'  Gou, J. (2022). Sample size optimization and initial allocation of the significance levels in group sequential trials with multiple endpoints. \emph{Biometrical Journal}, 64(2), 301–311.
 #'
 #' @examples
 #' cvec <- rep(1.992,3)
@@ -112,9 +114,10 @@ cdBoundary <- function (cvec, dvec, gammaVec, dlt, upper=TRUE) {
 #'
 #' @references
 #'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
+#'  Tamhane, A. C., & Gou, J. (2022). Chapter 2 - Multiple test procedures based on p-values. In X. Cui, T. Dickhaus, Y. Ding, & J. C. Hsu (Eds.), \emph{Handbook of multiple comparisons} (Vol. 45, pp. 11–34).
 #'
 #' @examples
-#' corrMat <- genCorrMat(gammaVec=c(sqrt(1/3),sqrt(2/3),1), type=2, rhoPS = 0.3)
+#' corrMat <- genCorrMat(gammaVec=c(sqrt(1/3), sqrt(2/3), 1), type=2, rhoPS = 0.3)
 #'
 genCorrMat <- function (gammaVec, type, rhoPS = 0) {
   K <- length(gammaVec);
@@ -139,7 +142,7 @@ genCorrMat <- function (gammaVec, type, rhoPS = 0) {
     }
     return(corrMat);
   } else {
-    print("Type is 1 (for primary endpoint calculation) or 2 (for secondary endpoint calculation).");
+    warning("Type is 1 (for primary endpoint calculation) or 2 (for secondary endpoint calculation).");
     return(type);
   }
 }
@@ -186,6 +189,8 @@ genCorrMat <- function (gammaVec, type, rhoPS = 0) {
 #'
 #'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 #'
+#'  Gou, J. (2023). Trigger strategy in repeated tests on multiple hypotheses. \emph{Statistics in Biopharmaceutical Research}, 15(1), 133–140.
+#'
 ldPrimaryBoundary <- function (tVec,alpha,type=1,initIntvl=c(0.8,8)) {
   K <- length(tVec);
   cVec <- rep(0,K);
@@ -196,7 +201,7 @@ ldPrimaryBoundary <- function (tVec,alpha,type=1,initIntvl=c(0.8,8)) {
     upperB <- c(cVec,ckk);
     meanV <- rep(0,kk);
     corrM <- genCorrMat(gammaVec,1);
-    result <- pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
+    result <- mvtnorm::pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
     return(result - 1 + alpha);
   }
   if (type == 1) {
@@ -204,7 +209,7 @@ ldPrimaryBoundary <- function (tVec,alpha,type=1,initIntvl=c(0.8,8)) {
     alphaVec <- 2 - 2*pnorm(qnorm(1-alpha/2)/gammaVec);
     cVec[1] <- qnorm(1-alphaVec[1]);
     for (i in 2:K) {
-      result.OF <- uniroot(target, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, cVec = cVec[1:(i-1)], gammaVec = gammaVec[1:i], alpha = alphaVec[i]);
+      result.OF <- stats::uniroot(target, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, cVec = cVec[1:(i-1)], gammaVec = gammaVec[1:i], alpha = alphaVec[i]);
       cVec[i] = result.OF$root;
     }
     return(cVec);
@@ -213,12 +218,12 @@ ldPrimaryBoundary <- function (tVec,alpha,type=1,initIntvl=c(0.8,8)) {
     alphaVec <- alpha*log(1 + (exp(1)-1)*tVec);
     cVec[1] <- qnorm(1-alphaVec[1]);
     for (i in 2:K) {
-      result.PO <- uniroot(target, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, cVec = cVec[1:(i-1)], gammaVec = gammaVec[1:i], alpha = alphaVec[i]);
+      result.PO <- stats::uniroot(target, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, cVec = cVec[1:(i-1)], gammaVec = gammaVec[1:i], alpha = alphaVec[i]);
       cVec[i] = result.PO$root;
     }
     return(cVec);
   } else {
-    print("Only OBF (1) and POC (2) are currently available.");
+    warning("Only OBF (1) and POC (2) are currently available.");
     return(K);
   }
 }
@@ -276,13 +281,13 @@ ldSecControl <- function (ap,alpha,cvec,tVec,ExtrmLoc,type=2) {
   K <- length(tVec);
   gammaVec <- sqrt(tVec);
   if (type == 1) {
-    dvec.obf <- bounds(tVec,iuse=c(1),alpha=c(ap));
+    dvec.obf <- ldbounds::ldBounds(t=tVec,iuse=c(1),alpha=c(ap),sides=1);
     dvec <- dvec.obf$upper.bounds;
   } else if (type == 2) {
-    dvec.poc <- bounds(tVec,iuse=c(2),alpha=c(ap));
+    dvec.poc <- ldbounds::ldBounds(t=tVec,iuse=c(2),alpha=c(ap),sides=1);
     dvec <- dvec.poc$upper.bounds;
   } else {
-    print("Type 1 OBF d, Type 2 POC d.");
+    warning("Type 1 OBF d, Type 2 POC d.");
     return(K);
   }
   dlt <- (cvec[ExtrmLoc] - dvec[ExtrmLoc])/gammaVec[ExtrmLoc];
@@ -292,7 +297,7 @@ ldSecControl <- function (ap,alpha,cvec,tVec,ExtrmLoc,type=2) {
     upperB <- cdBoundary(cvec[1:i], dvec[1:i], gammaVec[1:i], dlt, upper=TRUE);
     meanV <- rep(0,i);
     corrM <- genCorrMat(gammaVec[1:i],1);
-    ErrRate = ErrRate + pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
+    ErrRate = ErrRate + mvtnorm::pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
   }
   return(ErrRate - alpha);
 }
@@ -346,10 +351,10 @@ primaryBoundary <- function (gammaVec,alpha,type=1,initIntvl=c(1,4)) {
       upperB <- c/gammaVec;
       meanV <- rep(0,K);
       corrM <- genCorrMat(gammaVec,1);
-      result <- pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
+      result <- mvtnorm::pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
       return(result - 1 + alpha);
     }
-    result.OF <- uniroot(target, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, gammaVec = gammaVec, alpha = alpha);
+    result.OF <- stats::uniroot(target, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, gammaVec = gammaVec, alpha = alpha);
     return(result.OF$root);
   } else if (type == 2) {
     target <- function (c,gammaVec,alpha) {
@@ -357,13 +362,13 @@ primaryBoundary <- function (gammaVec,alpha,type=1,initIntvl=c(1,4)) {
       upperB <- c;
       meanV <- rep(0,K);
       corrM <- genCorrMat(gammaVec,1);
-      result <- pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
+      result <- mvtnorm::pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
       return(result - 1 + alpha);
     }
-    result.OF <- uniroot(target, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, gammaVec = gammaVec, alpha = alpha);
+    result.OF <- stats::uniroot(target, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, gammaVec = gammaVec, alpha = alpha);
     return(result.OF$root);
   } else {
-    print("Only OBF (1) and POC (2) are currently available.");
+    warning("Only OBF (1) and POC (2) are currently available.");
     return(K);
   }
 }
@@ -420,7 +425,7 @@ secControl <- function (d,alpha,cvec,gammaVec,ExtrmLoc,type=2) {
   } else if (type == 2) {
     dvec = d/rep(1,K);
   } else {
-    print("Type 1 OBF d, Type 2 POC d.");
+    warning("Type 1 OBF d, Type 2 POC d.");
     return(K);
   }
   dlt <- (cvec[ExtrmLoc] - dvec[ExtrmLoc])/gammaVec[ExtrmLoc];
@@ -430,7 +435,7 @@ secControl <- function (d,alpha,cvec,gammaVec,ExtrmLoc,type=2) {
     upperB <- cdBoundary(cvec[1:i], dvec[1:i], gammaVec[1:i], dlt, upper=TRUE);
     meanV <- rep(0,i);
     corrM <- genCorrMat(gammaVec[1:i],1);
-    ErrRate = ErrRate + pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
+    ErrRate = ErrRate + mvtnorm::pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
   }
   return(ErrRate - alpha);
 }
@@ -476,18 +481,18 @@ secControl <- function (d,alpha,cvec,gammaVec,ExtrmLoc,type=2) {
 #' @author Jiangtao Gou
 #'
 #' @examples
-#' #require(mvtnorm)
-#' #K = 4
-#' #alpha = 0.025
-#' #tVec = (1:K)/K
-#' #boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
-#' #   OBF=TRUE,LanDeMets=FALSE,digits=3,printOut=TRUE)
-#' #boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
-#' #   OBF=FALSE,LanDeMets=FALSE,digits=3,printOut=TRUE)
-#' #boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,8),
-#' #   OBF=TRUE,LanDeMets=TRUE,digits=3,printOut=TRUE)
-#' #boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
-#' #   OBF=FALSE,LanDeMets=TRUE,digits=3,printOut=TRUE)
+#' require(mvtnorm)
+#' K <- 4
+#' alpha <- 0.025
+#' tVec <- (1:K)/K
+#' boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
+#'    OBF=TRUE,LanDeMets=FALSE,digits=3,printOut=TRUE)
+#' boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
+#'    OBF=FALSE,LanDeMets=FALSE,digits=3,printOut=TRUE)
+#' boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,8),
+#'    OBF=TRUE,LanDeMets=TRUE,digits=3,printOut=TRUE)
+#' boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
+#'    OBF=FALSE,LanDeMets=TRUE,digits=3,printOut=TRUE)
 #'
 #' @references
 #'  Jennison, C. and Turnbull, B. W. (2000). \emph{Group Sequential Methods with Applications to Clinical Trials}. Chapman and Hall/CRC, New York.
@@ -526,7 +531,7 @@ primaryBoundaryVec  <- function (alpha,tVec,OBF=TRUE,LanDeMets=FALSE,digits=2,pr
     }
     rBndyVec <- round(bndyVec, digits);
     if (printOut == TRUE) {
-      print(rBndyVec);
+      message(rBndyVec);
     }
     return(bndyVec);
   } else {  # Lan-DeMets
@@ -540,7 +545,7 @@ primaryBoundaryVec  <- function (alpha,tVec,OBF=TRUE,LanDeMets=FALSE,digits=2,pr
     }
     rBndyVec <- round(bndyVec, digits);
     if (printOut == TRUE) {
-      print(rBndyVec);
+      message(rBndyVec);
     }
     return(bndyVec);
   }
@@ -587,14 +592,14 @@ primaryBoundaryVec  <- function (alpha,tVec,OBF=TRUE,LanDeMets=FALSE,digits=2,pr
 #'
 #' @seealso \code{SecondaryBoundary}, \code{ldInitLocBeak}
 #' @examples
-#' #require(mvtnorm)
-#' #K <- 8
-#' #gammaVec <- sqrt((1:K)/K)
-#' #tVec <- gammaVec^2
-#' #alpha = 0.025
-#' #c <- 2.072274
-#' #cvec <- c/gammaVec
-#' #loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,3))
+#' require(mvtnorm)
+#' K <- 8
+#' gammaVec <- sqrt((1:K)/K)
+#' tVec <- gammaVec^2
+#' alpha <- 0.025
+#' c <- 2.072274
+#' cvec <- c/gammaVec
+#' loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,3))
 #'
 #' @references
 #'  O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
@@ -610,7 +615,7 @@ initLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(1,4)) {
   for (j in 1:1) {
     resultVec <- rep(0,K); # Need to be predefined, otherwise the program does not work
     for (i in 1:K) {
-      result <- uniroot(secControl,lower=initIntvl[1],upper=initIntvl[2],tol=2.5e-16,alpha=alpha,cvec=cvec,gammaVec=gammaVec,ExtrmLoc=i,type=type);
+      result <- stats::uniroot(secControl,lower=initIntvl[1],upper=initIntvl[2],tol=2.5e-16,alpha=alpha,cvec=cvec,gammaVec=gammaVec,ExtrmLoc=i,type=type);
       resultVec[i] <- result$root;
       # print(resultVec);
     }
@@ -665,16 +670,18 @@ initLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(1,4)) {
 #'
 #' @seealso \code{ldSecondaryBoundary}, \code{initLocBeak}
 #' @examples
-#' #require(mvtnorm)
-#' #K <- 8
-#' #gammaVec <- sqrt((1:K)/K)
-#' #tVec <- gammaVec^2
-#' #alpha = 0.025
-#' #c <- 2.072274
-#' #cvec <- c/gammaVec
-#' #loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,4))
-#' #sbvec <- secondaryBoundary(alpha,tVec,cvec,loc,type=2,
-#' #       initIntvl=c(1,8))
+#' \dontrun{
+#' require(mvtnorm)
+#' K <- 8
+#' gammaVec <- sqrt((1:K)/K)
+#' tVec <- gammaVec^2
+#' alpha = 0.025
+#' c <- 2.072274
+#' cvec <- c/gammaVec
+#' loc <- initLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(1,4))
+#' sbvec <- secondaryBoundary(alpha,tVec,cvec,loc,type=2,
+#'        initIntvl=c(1,8))
+#' }
 #'
 #' @references
 #'  O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
@@ -688,7 +695,7 @@ secondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4)) 
   gammaVec <- sqrt(tVec);
   resultVec <- rep(0,1);
   for (i in 1:1) {
-    result <- uniroot(secControl, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, alpha=alpha,cvec=cvec,gammaVec=gammaVec,ExtrmLoc=locPeak,type=type);
+    result <- stats::uniroot(secControl, lower = initIntvl[1], upper = initIntvl[2], tol = 2.5e-16, alpha=alpha,cvec=cvec,gammaVec=gammaVec,ExtrmLoc=locPeak,type=type);
     resultVec[i] <- result$root;
   }
   dK <- median(resultVec) #
@@ -697,7 +704,7 @@ secondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4)) 
   } else if (type == 2) {
     bndyVec <- rep(dK,K);
   } else {
-    print("Type 1 OBF, Type 2 POC.");
+    warning("Type 1 OBF, Type 2 POC.");
   }
   return(bndyVec);
 }
@@ -742,14 +749,16 @@ secondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4)) 
 #'
 #' @seealso \code{ldSecondaryBoundary}, \code{initLocBeak}
 #' @examples
-#' #require(mvtnorm)
-#' #require(ldbounds)
-#' #K <- 6;
-#' #tVec <- c(140,328,453,578,659,1080)/1080;
-#' #alpha = 0.025;
-#' #cvec.obf <- bounds(tVec,iuse=c(1),alpha=c(alpha));
-#' #cvec <- cvec.obf$upper.bounds;
-#' #loc <- ldInitLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(0.9,4))
+#' \dontrun{
+#' require(mvtnorm)
+#' require(ldbounds)
+#' K <- 6;
+#' tVec <- c(140,328,453,578,659,1080)/1080;
+#' alpha = 0.025;
+#' cvec.obf <- ldbounds::ldBounds(tVec,iuse=c(1),alpha=c(alpha),sides=1);
+#' cvec <- cvec.obf$upper.bounds;
+#' loc <- ldInitLocPeak(alpha,tVec,cvec,type=2,initIntvl=c(0.9,4))
+#' }
 #'
 #' @references
 #'  Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
@@ -764,7 +773,7 @@ ldInitLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(0.8,4)) {
   for (j in 1:1) {
     resultVec <- rep(0,K); # Need to be predefined, otherwise the program does not work
     for (i in 1:K) {
-      result <- uniroot(ldSecControl,lower=initIntvl[1]*alpha,upper=initIntvl[2]*alpha,tol=2.5e-16,alpha=alpha,cvec=cvec,tVec=tVec,ExtrmLoc=i,type=type);
+      result <- stats::uniroot(ldSecControl,lower=initIntvl[1]*alpha,upper=initIntvl[2]*alpha,tol=2.5e-16,alpha=alpha,cvec=cvec,tVec=tVec,ExtrmLoc=i,type=type);
       resultVec[i] <- result$root;
       # print(resultVec);
     }
@@ -818,15 +827,17 @@ ldInitLocPeak <- function (alpha,tVec,cvec,type=2,initIntvl=c(0.8,4)) {
 #'
 #' @seealso \code{secondaryBoundary}, \code{secondaryBoundaryVecLD}
 #' @examples
-#' #require(mvtnorm)
-#' #require(ldbounds)
-#' #K <- 6;
-#' #tVec <- c(140,328,453,578,659,1080)/1080;
-#' #alpha = 0.025;
-#' #cvec.obf <- bounds(tVec,iuse=c(1),alpha=c(alpha));
-#' #cvec <- cvec.obf$upper.bounds;
-#' #secbound <- ldSecondaryBoundary(alpha,tVec,cvec,locPeak=4,type=2,
-#' #    initIntvl=c(0.8,8))
+#' \dontrun{
+#' require(mvtnorm)
+#' require(ldbounds)
+#' K <- 6;
+#' tVec <- c(140,328,453,578,659,1080)/1080;
+#' alpha = 0.025;
+#' cvec.obf <- ldbounds::ldBounds(t=tVec,iuse=c(1),alpha=c(alpha),sides = 1);
+#' cvec <- cvec.obf$upper.bounds;
+#' secbound <- ldSecondaryBoundary(alpha,tVec,cvec,locPeak=4,type=2,
+#'     initIntvl=c(0.8,8))
+#' }
 #'
 #' @references
 #'  Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
@@ -838,18 +849,18 @@ ldSecondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(0.6,
   gammaVec <- sqrt(tVec);
   resultVec <- rep(0,1);
   for (i in 1:1) {
-    result <- uniroot(ldSecControl, lower = initIntvl[1]*alpha, upper = initIntvl[2]*alpha, tol = 2.5e-16, alpha=alpha,cvec=cvec,tVec=tVec,ExtrmLoc=locPeak,type=type);
+    result <- stats::uniroot(ldSecControl, lower = initIntvl[1]*alpha, upper = initIntvl[2]*alpha, tol = 2.5e-16, alpha=alpha,cvec=cvec,tVec=tVec,ExtrmLoc=locPeak,type=type);
     resultVec[i] <- result$root;
   }
   aprime <- median(resultVec) #
   if (type == 1) {
-    dvec.obf <- bounds(tVec,iuse=c(1),alpha=c(aprime));
+    dvec.obf <- ldbounds::ldBounds(t=tVec,iuse=c(1),alpha=c(aprime),sides = 1);
     ldBndyVec <- dvec.obf$upper.bounds;
   } else if (type == 2) {
-    dvec.poc <- bounds(tVec,iuse=c(2),alpha=c(aprime));
+    dvec.poc <- ldbounds::ldBounds(t=tVec,iuse=c(2),alpha=c(aprime),sides=1);
     ldBndyVec <- dvec.poc$upper.bounds;
   } else {
-    print("Type 1 OBF, Type 2 POC.");
+    warning("Type 1 OBF, Type 2 POC.");
   }
   return(ldBndyVec);
 }
@@ -897,15 +908,17 @@ ldSecondaryBoundary <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(0.6,
 #'
 #' @seealso \code{nominalSig}, \code{secondaryBoundaryVecLD}
 #' @examples
-#' #require(mvtnorm)
-#' #require(ldbounds)
-#' #K <- 6;
-#' #tVec <- c(140,328,453,578,659,1080)/1080;
-#' #alpha = 0.025;
-#' #cvec.obf <- bounds(tVec,iuse=c(1),alpha=c(alpha));
-#' #cvec <- cvec.obf$upper.bounds;
-#' #alphaprime <- ldNominalSig(alpha,tVec,cvec,locPeak=4,type=2,
-#' #      initIntvl=c(1,4))
+#' \dontrun{
+#' require(mvtnorm)
+#' require(ldbounds)
+#' K <- 6;
+#' tVec <- c(140,328,453,578,659,1080)/1080;
+#' alpha <- 0.025;
+#' cvec.obf <- ldbounds::ldBounds(t=tVec,iuse=c(1),alpha=c(alpha),sides = 1);
+#' cvec <- cvec.obf$upper.bounds;
+#' alphaprime <- ldNominalSig(alpha,tVec,cvec,locPeak=4,type=2,
+#'       initIntvl=c(1,4))
+#' }
 #'
 #' @references
 #'  Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
@@ -917,7 +930,7 @@ ldNominalSig <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4)) {
   gammaVec <- sqrt(tVec);
   resultVec <- rep(0,1);
   for (i in 1:1) {
-    result <- uniroot(ldSecControl, lower = initIntvl[1]*alpha, upper = initIntvl[2]*alpha, tol = 2.5e-16, alpha=alpha,cvec=cvec,tVec=tVec,ExtrmLoc=locPeak,type=type);
+    result <- stats::uniroot(ldSecControl, lower = initIntvl[1]*alpha, upper = initIntvl[2]*alpha, tol = 2.5e-16, alpha=alpha,cvec=cvec,tVec=tVec,ExtrmLoc=locPeak,type=type);
     resultVec[i] <- result$root;
   }
   aprime <- median(resultVec) #
@@ -959,9 +972,9 @@ ldNominalSig <- function (alpha,tVec,cvec,locPeak,type=2,initIntvl=c(1,4)) {
 #'
 #' @seealso \code{ldNominalSig}, \code{secondaryBoundaryVecOrig}
 #' @examples
-#' #require(mvtnorm)
-#' #require(ldbounds)
-#' #nSig <- nominalSig(gammaVec=c(sqrt(1/3),1),cvec=c(2.2,1.8))
+#' require(mvtnorm)
+#' require(ldbounds)
+#' nSig <- nominalSig(gammaVec=c(sqrt(1/3),1),cvec=c(2.2,1.8))
 #'
 #' @author Jiangtao Gou
 #'
@@ -978,7 +991,7 @@ nominalSig <- function (gammaVec,cvec) {
   upperB <- cvec; #print(upperB)
   meanV <- rep(0,K);
   corrM <- genCorrMat(gammaVec,1); #print(corrM)
-  result <- pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
+  result <- mvtnorm::pmvnorm(lowerB, upperB, meanV, corrM, algorithm=Miwa(steps=128));
   return(1 - result[1]);
 }
 # End of function primaryBoundary
@@ -1023,7 +1036,7 @@ nominalSig <- function (gammaVec,cvec) {
 #' @details
 #' This function uses the standard approach (O'Brien and Fleming 1979, Pocock 1977),
 #' and gives a list including refined secondary boundary and the nominal significance for the secondary endpoint.
-#' There is a computing parameter \code{initIntvl}. 
+#' There is a computing parameter \code{initIntvl}.
 #' Parameter \code{initIntvl} contains the end-points of the interval to be searched for the root.
 #' The lower end point should choose a number around 1,
 #' and the upper end point should choose a number between 4 and 10.
@@ -1036,12 +1049,12 @@ nominalSig <- function (gammaVec,cvec) {
 #'
 #' @seealso \code{secondaryBoundaryVec}, \code{secondaryBoundaryVecLD}
 #' @examples
-#' #require(mvtnorm)
-#' #require(ldbounds)
-#' #result <- secondaryBoundaryVecOrig(alpha=0.025,tVec=c(1/2,1),primaryOBF=TRUE,
-#' #        secondaryOBF=FALSE, initIntvl=c(1,4))
-#' #result$secondaryBoundary
-#' #result$nomialSignificance
+#' require(mvtnorm)
+#' require(ldbounds)
+#' result <- secondaryBoundaryVecOrig(alpha=0.025,tVec=c(1/2,1),primaryOBF=TRUE,
+#'        secondaryOBF=FALSE, initIntvl=c(1,4))
+#' result$secondaryBoundary
+#' result$nomialSignificance
 #'
 #' @references
 #'  Glimm, E., Maurer, W., and Bretz, F. (2010). Hierarchical testing of multiple endpoints in group-sequential trials. \emph{Statistics in Medicine} \bold{29}, 219-228.
@@ -1056,7 +1069,7 @@ nominalSig <- function (gammaVec,cvec) {
 #'
 #'  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48. 
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 #'
 secondaryBoundaryVecOrig  <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALSE,initIntvl=c(1,8)) {
   #
@@ -1105,7 +1118,7 @@ secondaryBoundaryVecOrig  <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=F
 #' @details
 #' This function uses the Lan-DeMets error spending approach,
 #' and gives a list including refined secondary boundary and the nominal significance for the secondary endpoint.
-#' There is a computing parameter \code{initIntvl}. 
+#' There is a computing parameter \code{initIntvl}.
 #' Parameter \code{initIntvl} contains the end-points of the interval to be searched for the root.
 #' For Lan-DeMets error spending approach, the lower end point should choose a number slightly less than 1,
 #' and the upper end point should choose a number between 4 and 10.
@@ -1118,12 +1131,12 @@ secondaryBoundaryVecOrig  <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=F
 #'
 #' @seealso \code{secondaryBoundaryVec}, \code{secondaryBoundaryVecOrig}
 #' @examples
-#' #require(mvtnorm)
-#' #require(ldbounds)
-#' #result <- secondaryBoundaryVecLD(alpha=0.025,tVec=c(1/2,1),primaryOBF=TRUE,
-#' #        secondaryOBF=FALSE,initIntvl=c(0.8,6))
-#' #result$secondaryBoundary
-#' #result$nomialSignificance
+#' require(mvtnorm)
+#' require(ldbounds)
+#' result <- secondaryBoundaryVecLD(alpha=0.025,tVec=c(1/2,1),primaryOBF=TRUE,
+#'         secondaryOBF=FALSE,initIntvl=c(0.8,6))
+#' result$secondaryBoundary
+#' result$nomialSignificance
 #'
 #' @references
 #'  Glimm, E., Maurer, W., and Bretz, F. (2010). Hierarchical testing of multiple endpoints in group-sequential trials. \emph{Statistics in Medicine} \bold{29}, 219-228.
@@ -1160,7 +1173,7 @@ secondaryBoundaryVecLD <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALS
     } else {
       sType = 2;
     }
-    cvec.bounds <- bounds(tVec,iuse=c(pType),alpha=c(alpha));
+    cvec.bounds <- ldbounds::ldBounds(t=tVec,iuse=c(pType),alpha=c(alpha),sides = 1);
     cvec <- cvec.bounds$upper.bounds;
     peakLocation <- ldInitLocPeak(alpha=alpha,tVec=tVec,cvec=cvec,type=sType,initIntvl=initIntvl);
     bndyVec <- ldSecondaryBoundary(alpha=alpha,tVec=tVec,cvec=cvec,locPeak=peakLocation,type=sType,initIntvl=initIntvl);
@@ -1194,7 +1207,7 @@ secondaryBoundaryVecLD <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALS
 #'
 #' @details
 #' This function gives a list including refined secondary boundary and the nominal significance for the secondary endpoint.
-#' There are a computing parameter \code{initIntvl}. 
+#' There are a computing parameter \code{initIntvl}.
 #' Parameter \code{initIntvl} contains the end-points of the interval to be searched for the root.
 #' For Lan-DeMets error spending approach, the lower end point should choose a number slightly less than 1,
 #' and the upper end point should choose a number between 4 and 10.
@@ -1207,12 +1220,12 @@ secondaryBoundaryVecLD <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALS
 #'
 #' @seealso \code{secondaryBoundaryVecLD}, \code{secondaryBoundaryVecOrig}
 #' @examples
-#' #require(mvtnorm)
-#' #require(ldbounds)
-#' #result <- secondaryBoundaryVec(alpha=0.025,tVec=c(1/2,1),pOBF=TRUE,sOBF=FALSE,
-#' #       LanDeMets=FALSE,initIntvl=c(0.8,5))
-#' #result$secondaryBoundary
-#' #result$nomialSignificance
+#' require(mvtnorm)
+#' require(ldbounds)
+#' result <- secondaryBoundaryVec(alpha=0.025,tVec=c(1/2,1),pOBF=TRUE,sOBF=FALSE,
+#'        LanDeMets=FALSE,initIntvl=c(0.8,5))
+#' result$secondaryBoundary
+#' result$nomialSignificance
 #'
 #' @references
 #'  Glimm, E., Maurer, W., and Bretz, F. (2010). Hierarchical testing of multiple endpoints in group-sequential trials. \emph{Statistics in Medicine} \bold{29}, 219-228.
@@ -1229,7 +1242,7 @@ secondaryBoundaryVecLD <- function (alpha,tVec,primaryOBF=TRUE,secondaryOBF=FALS
 #'
 #'  Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 #'
-#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48. 
+#'  Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 #'
 secondaryBoundaryVec <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,initIntvl=c(0.8,8)) {
   #
@@ -1308,7 +1321,7 @@ refinedBoundary <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,dig
   rpd <- round(pd, dgt);
   rsd <- round(bdns$secondaryBoundary, dgt);
   nsdgt <- 3+round(log10(1/alpha));
-  nsdgt <- max(dgt, nsdgt); 
+  nsdgt <- max(dgt, nsdgt);
   rns <- round(bdns$nomialSignificance, nsdgt);
   resultlist <- list("primaryBoundary" = rpd, "secondaryBoundary" = rsd, "nomialSignificance" = rns)
   return(resultlist)
@@ -1336,7 +1349,7 @@ refinedBoundary <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,dig
 #' @return a TeX format table including both primary boundary and refined secondary boundary.
 #'
 #' @details
-#' This function gives a TeX format table including both primary boundary and refined secondary boundary. 
+#' This function gives a TeX format table including both primary boundary and refined secondary boundary.
 #' The number of digits after decimal point can be specified through parameter \code{digits}.
 #'
 #' @export
@@ -1346,10 +1359,11 @@ refinedBoundary <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,dig
 #' @import xtable
 #'
 #' @examples
-#' #require(mvtnorm)
-#' #require(ldbounds)
-#' #require(xtable)
-#' #psbTeXtable(alpha=0.025,tVec=c(1/2,3/4,1),pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE)
+#' require(mvtnorm)
+#' require(ldbounds)
+#' require(xtable)
+#' psbTeXtable(alpha=0.025,tVec=c(1/2,3/4,1),pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE)
+#'
 #' @references
 #'  Glimm, E., Maurer, W., and Bretz, F. (2010). Hierarchical testing of multiple endpoints in group-sequential trials. \emph{Statistics in Medicine} \bold{29}, 219-228.
 #'
@@ -1372,7 +1386,7 @@ psbTeXtable <- function (alpha,tVec,pOBF=TRUE,sOBF=FALSE,LanDeMets=FALSE,digits=
   result <- refinedBoundary(alpha=alpha,tVec=tVec,pOBF=pOBF,sOBF=sOBF,LanDeMets=LanDeMets,digits=digits);
   psb <- data.frame(result$primaryBoundary, result$secondaryBoundary);
   colnames(psb) <- c("Primary Boundary", "Refined Secondary Boundary");
-  print(xtable(psb,label = 'tab:psb',
+  return(xtable::xtable(psb,label = 'tab:psb',
                caption = 'Primary Boundary and Refined Secondary Boundary', digits=digits));
 }
 # End of function psbTeXtable

@@ -4,8 +4,15 @@
 \alias{primaryBoundaryVec}
 \title{Calculate the Primary Boundaries}
 \usage{
-primaryBoundaryVec(alpha, tVec, OBF = TRUE, LanDeMets = FALSE,
-  digits = 2, printOut = TRUE, initIntvl = c(1, 8))
+primaryBoundaryVec(
+  alpha,
+  tVec,
+  OBF = TRUE,
+  LanDeMets = FALSE,
+  digits = 2,
+  printOut = TRUE,
+  initIntvl = c(1, 8)
+)
 }
 \arguments{
 \item{alpha}{significance level for the primary endpoint.}
@@ -29,30 +36,30 @@ OBF and POC boundaries (primary endpoints) (vector).
 Primary boundaries are calculated, including the standard approach and the error spending approach.
 }
 \examples{
-#require(mvtnorm)
-#K = 4
-#alpha = 0.025
-#tVec = (1:K)/K
-#boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
-#   OBF=TRUE,LanDeMets=FALSE,digits=3,printOut=TRUE)
-#boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
-#   OBF=FALSE,LanDeMets=FALSE,digits=3,printOut=TRUE)
-#boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,8),
-#   OBF=TRUE,LanDeMets=TRUE,digits=3,printOut=TRUE)
-#boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
-#   OBF=FALSE,LanDeMets=TRUE,digits=3,printOut=TRUE)
+require(mvtnorm)
+K <- 4
+alpha <- 0.025
+tVec <- (1:K)/K
+boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
+   OBF=TRUE,LanDeMets=FALSE,digits=3,printOut=TRUE)
+boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
+   OBF=FALSE,LanDeMets=FALSE,digits=3,printOut=TRUE)
+boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,8),
+   OBF=TRUE,LanDeMets=TRUE,digits=3,printOut=TRUE)
+boundaryVector <- primaryBoundaryVec(alpha,tVec,initIntvl=c(1,4),
+   OBF=FALSE,LanDeMets=TRUE,digits=3,printOut=TRUE)
 
 }
 \references{
 Jennison, C. and Turnbull, B. W. (2000). \emph{Group Sequential Methods with Applications to Clinical Trials}. Chapman and Hall/CRC, New York.
 
- Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
+Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
 
- O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
+O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
 
- Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
+Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
+Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74(1), 40-48.
 }
 \author{
 Jiangtao Gou

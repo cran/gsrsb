@@ -4,8 +4,14 @@
 \alias{refinedBoundary}
 \title{Summarize Primary and Refined Secondary Boundaries, Nominal Significance}
 \usage{
-refinedBoundary(alpha, tVec, pOBF = TRUE, sOBF = FALSE,
-  LanDeMets = FALSE, digits = 2)
+refinedBoundary(
+  alpha,
+  tVec,
+  pOBF = TRUE,
+  sOBF = FALSE,
+  LanDeMets = FALSE,
+  digits = 2
+)
 }
 \arguments{
 \item{alpha}{type I error probability.}
@@ -42,19 +48,19 @@ result$nomialSignificance
 \references{
 Glimm, E., Maurer, W., and Bretz, F. (2010). Hierarchical testing of multiple endpoints in group-sequential trials. \emph{Statistics in Medicine} \bold{29}, 219-228.
 
- Hung, H. M. J., Wang, S.-J., and O'Neill, R. (2007). Statistical considerations for testing multiple endpoints in group sequential or adaptive clinical trials. \emph{Journal of Biopharmaceutical Statistics} \bold{17}, 1201-1210.
+Hung, H. M. J., Wang, S.-J., and O'Neill, R. (2007). Statistical considerations for testing multiple endpoints in group sequential or adaptive clinical trials. \emph{Journal of Biopharmaceutical Statistics} \bold{17}, 1201-1210.
 
- Jennison, C. and Turnbull, B. W. (2000). \emph{Group Sequential Methods with Applications to Clinical Trials}. Chapman and Hall/CRC, New York.
+Jennison, C. and Turnbull, B. W. (2000). \emph{Group Sequential Methods with Applications to Clinical Trials}. Chapman and Hall/CRC, New York.
 
- Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
+Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
 
- O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
+O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
 
- Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
+Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
 
- Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
+Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48
+Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48
 }
 \author{
 Jiangtao Gou

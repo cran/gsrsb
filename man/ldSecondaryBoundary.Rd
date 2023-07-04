@@ -4,8 +4,14 @@
 \alias{ldSecondaryBoundary}
 \title{Calculate Refined Secondary Boundary, Error Spending Approach}
 \usage{
-ldSecondaryBoundary(alpha, tVec, cvec, locPeak, type = 2,
-  initIntvl = c(0.6, 4))
+ldSecondaryBoundary(
+  alpha,
+  tVec,
+  cvec,
+  locPeak,
+  type = 2,
+  initIntvl = c(0.6, 4)
+)
 }
 \arguments{
 \item{alpha}{original significance level.}
@@ -30,21 +36,23 @@ Refined secondary boundaries are calculated by using the error spending approach
 This function calculates the refined secondary boundaries of any Lan-DeMets error spending boundary based on the primary boundaries.
 }
 \examples{
-#require(mvtnorm)
-#require(ldbounds)
-#K <- 6;
-#tVec <- c(140,328,453,578,659,1080)/1080;
-#alpha = 0.025;
-#cvec.obf <- bounds(tVec,iuse=c(1),alpha=c(alpha));
-#cvec <- cvec.obf$upper.bounds;
-#secbound <- ldSecondaryBoundary(alpha,tVec,cvec,locPeak=4,type=2,
-#    initIntvl=c(0.8,8))
+\dontrun{
+require(mvtnorm)
+require(ldbounds)
+K <- 6;
+tVec <- c(140,328,453,578,659,1080)/1080;
+alpha = 0.025;
+cvec.obf <- ldbounds::ldBounds(t=tVec,iuse=c(1),alpha=c(alpha),sides = 1);
+cvec <- cvec.obf$upper.bounds;
+secbound <- ldSecondaryBoundary(alpha,tVec,cvec,locPeak=4,type=2,
+    initIntvl=c(0.8,8))
+}
 
 }
 \references{
 Lan, K. K. G., and Demets, D. L. (1983). Discrete sequential boundaries for clinical trials. \emph{Biometrika} \bold{70}, 659-663.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
+Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2017+). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 }
 \seealso{
 \code{secondaryBoundary}, \code{secondaryBoundaryVecLD}

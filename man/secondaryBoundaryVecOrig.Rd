@@ -4,8 +4,13 @@
 \alias{secondaryBoundaryVecOrig}
 \title{Calculate Refined Secondary Boundaries and Nominal Significance, Standard Approach}
 \usage{
-secondaryBoundaryVecOrig(alpha, tVec, primaryOBF = TRUE,
-  secondaryOBF = FALSE, initIntvl = c(1, 8))
+secondaryBoundaryVecOrig(
+  alpha,
+  tVec,
+  primaryOBF = TRUE,
+  secondaryOBF = FALSE,
+  initIntvl = c(1, 8)
+)
 }
 \arguments{
 \item{alpha}{type I error probability.}
@@ -27,34 +32,34 @@ Standard refined secondary boundaries, and nominal significance for the secondar
 \details{
 This function uses the standard approach (O'Brien and Fleming 1979, Pocock 1977),
 and gives a list including refined secondary boundary and the nominal significance for the secondary endpoint.
-There is a computing parameter \code{initIntvl}. 
+There is a computing parameter \code{initIntvl}.
 Parameter \code{initIntvl} contains the end-points of the interval to be searched for the root.
 The lower end point should choose a number around 1,
 and the upper end point should choose a number between 4 and 10.
 }
 \examples{
-#require(mvtnorm)
-#require(ldbounds)
-#result <- secondaryBoundaryVecOrig(alpha=0.025,tVec=c(1/2,1),primaryOBF=TRUE,
-#        secondaryOBF=FALSE, initIntvl=c(1,4))
-#result$secondaryBoundary
-#result$nomialSignificance
+require(mvtnorm)
+require(ldbounds)
+result <- secondaryBoundaryVecOrig(alpha=0.025,tVec=c(1/2,1),primaryOBF=TRUE,
+       secondaryOBF=FALSE, initIntvl=c(1,4))
+result$secondaryBoundary
+result$nomialSignificance
 
 }
 \references{
 Glimm, E., Maurer, W., and Bretz, F. (2010). Hierarchical testing of multiple endpoints in group-sequential trials. \emph{Statistics in Medicine} \bold{29}, 219-228.
 
- Hung, H. M. J., Wang, S.-J., and O'Neill, R. (2007). Statistical considerations for testing multiple endpoints in group sequential or adaptive clinical trials. \emph{Journal of Biopharmaceutical Statistics} \bold{17}, 1201-1210.
+Hung, H. M. J., Wang, S.-J., and O'Neill, R. (2007). Statistical considerations for testing multiple endpoints in group sequential or adaptive clinical trials. \emph{Journal of Biopharmaceutical Statistics} \bold{17}, 1201-1210.
 
- Jennison, C. and Turnbull, B. W. (2000). \emph{Group Sequential Methods with Applications to Clinical Trials}. Chapman and Hall/CRC, New York.
+Jennison, C. and Turnbull, B. W. (2000). \emph{Group Sequential Methods with Applications to Clinical Trials}. Chapman and Hall/CRC, New York.
 
- O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
+O'Brien, P. C., and Fleming, T. R. (1979). A multiple testing procedure for clinical trials. \emph{Biometrics} \bold{35}, 549-556.
 
- Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
+Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. \emph{Biometrika} \bold{64}, 191-199.
 
- Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
+Tamhane, A. C., Mehta, C. R., and Liu, L. (2010). Testing a primary and a secondary endpoint in a group sequential design. \emph{Biometrics} \bold{66}, 1174-1184.
 
- Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
+Tamhane, A. C., Gou, J., Jennison, C., Mehta, C. R., and Curto, T. (2018). A gatekeeping procedure to test a primary and a secondary endpoint in a group sequential design with multiple interim looks. \emph{Biometrics}, 74, 40-48.
 }
 \seealso{
 \code{secondaryBoundaryVec}, \code{secondaryBoundaryVecLD}
